@@ -1,0 +1,374 @@
+{
+  "$defs": {
+    "CompactFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/CompactLocation"
+        },
+        "i": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "I",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "i",
+        "at"
+      ],
+      "title": "CompactFrame",
+      "type": "object"
+    },
+    "CompactLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File"
+        },
+        "fn": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fn"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "maximum": 9223372036854775807,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line"
+        },
+        "pc": {
+          "anyOf": [
+            {
+              "pattern": "^0x[0-9a-f]{1,16}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pc"
+        }
+      },
+      "title": "CompactLocation",
+      "type": "object"
+    },
+    "OmissionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "frames": {
+          "default": 0,
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Frames",
+          "type": "integer"
+        },
+        "regs": {
+          "default": 0,
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Regs",
+          "type": "integer"
+        },
+        "vars": {
+          "default": 0,
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Vars",
+          "type": "integer"
+        }
+      },
+      "title": "OmissionCounts",
+      "type": "object"
+    },
+    "StopReason": {
+      "enum": [
+        "entry",
+        "breakpoint",
+        "watchpoint",
+        "step",
+        "signal",
+        "exception",
+        "interrupt"
+      ],
+      "title": "StopReason",
+      "type": "string"
+    },
+    "ValueDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After"
+        },
+        "aref": {
+          "anyOf": [
+            {
+              "maxLength": 16,
+              "minLength": 16,
+              "pattern": "^[0-9a-f]{16}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aref"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before"
+        },
+        "bref": {
+          "anyOf": [
+            {
+              "maxLength": 16,
+              "minLength": 16,
+              "pattern": "^[0-9a-f]{16}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bref"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "add",
+            "set",
+            "del"
+          ],
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "op"
+      ],
+      "title": "ValueDelta",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CompactLocation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "base": {
+      "anyOf": [
+        {
+          "maximum": 9223372036854775807,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base"
+    },
+    "cursor": {
+      "anyOf": [
+        {
+          "maxLength": 16,
+          "minLength": 16,
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cursor"
+    },
+    "eid": {
+      "maximum": 9223372036854775807,
+      "minimum": 1,
+      "title": "Eid",
+      "type": "integer"
+    },
+    "frames": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CompactFrame"
+      },
+      "maxItems": 5,
+      "title": "Frames",
+      "type": "array"
+    },
+    "hint": {
+      "anyOf": [
+        {
+          "const": "set_breakpoint",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hint"
+    },
+    "omitted": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OmissionCounts"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reason": {
+      "$ref": "#/$defs/StopReason"
+    },
+    "regs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValueDelta"
+      },
+      "maxItems": 8,
+      "title": "Regs",
+      "type": "array"
+    },
+    "sid": {
+      "maxLength": 16,
+      "minLength": 16,
+      "pattern": "^[0-9a-f]{16}$",
+      "title": "Sid",
+      "type": "string"
+    },
+    "stop": {
+      "maximum": 9223372036854775807,
+      "minimum": 1,
+      "title": "Stop",
+      "type": "integer"
+    },
+    "thread": {
+      "anyOf": [
+        {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Thread"
+    },
+    "type": {
+      "const": "stop",
+      "default": "stop",
+      "title": "Type",
+      "type": "string"
+    },
+    "v": {
+      "const": 1,
+      "default": 1,
+      "title": "V",
+      "type": "integer"
+    },
+    "vars": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValueDelta"
+      },
+      "maxItems": 8,
+      "title": "Vars",
+      "type": "array"
+    }
+  },
+  "required": [
+    "sid",
+    "eid",
+    "stop",
+    "reason"
+  ],
+  "title": "CompactDebugState",
+  "type": "object",
+  "x-token-budget": {
+    "encodings": [
+      "cl100k_base",
+      "o200k_base"
+    ],
+    "enforcedBy": "dea.contracts.wire.WireGuard.encode",
+    "maximum": 191
+  }
+}

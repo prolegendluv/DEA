@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dea-mcp"
+version = "0.1.0"
+description = "Stateful debugger contracts for coding agents"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pydantic==2.13.4", "tiktoken==0.14.0", "mcp==2.1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2"]
+
+[project.scripts]
+dea = "dea.gateways.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = ["--import-mode=importlib"]
+
