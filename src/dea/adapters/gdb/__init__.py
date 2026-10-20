@@ -1,8 +1,5 @@
-"""WP4: GDB/MI parser and adapter."""
-from dea.contracts.adapter import UnimplementedAdapter
-from dea.contracts.models import Backend
+"""GDB all-stop asynchronous MI adapter."""
+from .adapter import GdbAdapter
 
-
-class GdbAdapter(UnimplementedAdapter):
-    backend = Backend.GDB
+__all__ = ["GdbAdapter"]
 

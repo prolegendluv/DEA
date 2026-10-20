@@ -1,8 +1,5 @@
-"""WP5: LLDB Python helper and asynchronous event adapter."""
-from dea.contracts.adapter import UnimplementedAdapter
-from dea.contracts.models import Backend
+"""LLDB runs in a probed, ABI-compatible Python helper, never in this process."""
+from .adapter import LldbAdapter
 
-
-class LldbAdapter(UnimplementedAdapter):
-    backend = Backend.LLDB
+__all__ = ["LldbAdapter"]
 
