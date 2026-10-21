@@ -67,6 +67,40 @@ DEA compares original captured values, preserves unknown observations, and reset
 baselines when frame context changes. Large values and omitted changes live in
 immutable, paginated details. JSON is never cut mid-record to meet the limit.
 
+## Real Agent Trace
+
+Captured from the real MCP stdio server (`python -m dea serve`) using the PDB
+backend and `demos/python_offbyone/buggy.py` on Windows / Python 3.14.6. These
+are the exact, unmodified canonical JSON strings delivered in MCP text blocks.
+Every emitted field, including scoped delta IDs, paths, omission counts, and
+cursor handles, is preserved. Optional fields absent below were absent in the
+server response. Session/cursor handles belong to this captured run; new sessions
+return their own handles.
+
+### Conditional breakpoint hit — `stop: 2`
+
+The conditional breakpoint stops before line 9 at `index == 4096`, without
+single-stepping through the loop. Measured on the exact string below using DEA's
+wire token counter: **`cl100k_base`: 173 tokens; `o200k_base`: 175 tokens**.
+
+```json
+{"cursor":"0000000000000004","eid":4,"frames":[{"at":{"file":"E:\\Projects\\stars\\demos\\python_offbyone\\buggy.py","fn":"checksum","line":9},"i":0}],"omitted":{"frames":1,"regs":0,"vars":0},"reason":"breakpoint","sid":"9a054a628c8d7973","stop":2,"type":"stop","v":1,"vars":[{"after":"4096","id":"thread:1/frame:2/local:index","name":"index","op":"add"},{"after":"4096","id":"thread:1/frame:2/local:item","name":"item","op":"add"},{"after":"8386560","id":"thread:1/frame:2/local:total","name":"total","op":"add"}]}
+```
+
+### Step over the corrupting assignment — `stop: 3`
+
+Executing line 9 advances to line 10. The `base: 2` delta records `item` changing
+from `4096` to `4095`. Measured on the exact string below using DEA's wire token
+counter: **`cl100k_base`: 177 tokens; `o200k_base`: 179 tokens**.
+
+```json
+{"at":{"file":"E:\\Projects\\stars\\demos\\python_offbyone\\buggy.py","fn":"checksum","line":10},"base":2,"eid":6,"frames":[{"at":{"file":"E:\\Projects\\stars\\demos\\python_offbyone\\buggy.py","fn":"checksum","line":10},"i":0},{"at":{"file":"E:\\Projects\\stars\\demos\\python_offbyone\\buggy.py","fn":"<module>","line":15},"i":1}],"reason":"step","sid":"9a054a628c8d7973","stop":3,"thread":1,"type":"stop","v":1,"vars":[{"after":"4095","before":"4096","id":"thread:1/frame:2/local:item","name":"item","op":"set"}]}
+```
+
+Both payloads validate as `CompactDebugState` and round-trip through `WireGuard`
+without changing a byte. Counts include the complete JSON payload and exclude
+the MCP envelope. Both stops satisfy the 191-token budget under both encodings.
+
 ## Quickstart
 
 Requires **Python 3.12+**. From a checkout of this repository:

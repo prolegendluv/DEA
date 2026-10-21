@@ -95,67 +95,106 @@ def create_server(sessions: SessionService, guard: WireGuard, *,
 
     @server.tool(structured_output=False)
     async def session_start(request: LaunchSpec) -> CallToolResult:
-        """Launch a target in a persistent DEA session."""
+        """Launch a target in a persistent DEA session; retain the returned session ID.
+
+        Example: {"request":{"backend":"pdb","binary_path":"/absolute/path/to/buggy.py"}}
+        """
         return await respond(lambda: sessions.session_start(request))
 
     @server.tool(structured_output=False)
     async def session_attach(request: AttachSpec) -> CallToolResult:
-        """Attach GDB or LLDB to an existing process."""
+        """Attach GDB or LLDB to an existing process.
+
+        Example: {"request":{"backend":"gdb","pid":1234,"binary_path":"/absolute/path/to/program"}}
+        """
         return await respond(lambda: sessions.session_attach(request))
 
     @server.tool(structured_output=False)
     async def breakpoint_set(request: BreakpointRequest) -> CallToolResult:
-        """Set a source/function breakpoint and optional condition."""
+        """Set a source/function breakpoint and optional condition; use the returned session ID.
+
+        Example: {"request":{"session_id":"0123456789abcdef","spec":{"location":"/absolute/path/to/buggy.py:9","condition":"index == 4096"}}}
+        """
         return await respond(lambda: sessions.breakpoint_set(request.session_id, request.spec))
 
     @server.tool(structured_output=False)
     async def execution_continue(request: SessionRequest) -> CallToolResult:
-        """Resume execution; acknowledgement does not imply a stop."""
+        """Resume execution; acknowledgement does not imply a stop.
+
+        Example: {"request":{"session_id":"0123456789abcdef"}}
+        """
         return await respond(lambda: sessions.execution_continue(request.session_id))
 
     @server.tool(structured_output=False)
     async def execution_step(request: StepRequest) -> CallToolResult:
-        """Step over, into, or out; consume the resulting event separately."""
+        """Step over, into, or out; consume the resulting event separately.
+
+        Example: {"request":{"session_id":"0123456789abcdef","mode":"over"}}
+        """
         return await respond(lambda: sessions.execution_step(request.session_id, request.mode))
 
     @server.tool(structured_output=False)
     async def execution_interrupt(request: SessionRequest) -> CallToolResult:
-        """Request interruption of a running target."""
+        """Request interruption of a running target.
+
+        Example: {"request":{"session_id":"0123456789abcdef"}}
+        """
         return await respond(lambda: sessions.execution_interrupt(request.session_id))
 
     @server.tool(structured_output=False)
     async def state_inspect_frame(request: FrameRequest) -> CallToolResult:
-        """Inspect a stopped frame through capped pages."""
+        """Inspect a stopped frame through capped pages.
+
+        Example: {"request":{"session_id":"0123456789abcdef","frame_index":0,"max_depth":1}}
+        """
         return await respond(lambda: sessions.state_inspect_frame(request.session_id, request.frame_index, request.max_depth))
 
     @server.tool(structured_output=False)
     async def state_eval_expression(request: EvaluationRequest) -> CallToolResult:
-        """Evaluate an expression in a stopped target; evaluation may have side effects."""
+        """Evaluate an expression in a stopped target; evaluation may have side effects.
+
+        Example: {"request":{"session_id":"0123456789abcdef","expr":"item - index"}}
+        """
         return await respond(lambda: sessions.state_eval_expression(request.session_id, request.expr))
 
     @server.tool(structured_output=False)
     async def state_memory_diff(request: MemoryDiffRequest) -> CallToolResult:
-        """Compare previously configured memory regions against a retained stop."""
+        """Compare previously configured memory regions against a retained stop.
+
+        Example: {"request":{"session_id":"0123456789abcdef","since_step_id":2}}
+        """
         return await respond(lambda: sessions.state_memory_diff(request.session_id, request.since_step_id))
 
     @server.tool(structured_output=False)
     async def session_wait(request: WaitRequest) -> CallToolResult:
-        """Return the next journal event after eid; timeout leaves the target running."""
+        """Return the next journal event after eid; timeout leaves the target running.
+
+        Example: {"request":{"session_id":"0123456789abcdef","after_event_id":4,"timeout_ms":1000}}
+        """
         return await respond(lambda: sessions.session_wait(request.session_id, request.after_event_id, request.timeout_ms))
 
     @server.tool(structured_output=False)
     async def state_page(request: PageRequest) -> CallToolResult:
-        """Continue immutable captured details; never recapture a live target."""
+        """Continue immutable captured details; use the cursor returned by the preceding response.
+
+        Example: {"request":{"session_id":"0123456789abcdef","cursor_id":"0000000000000004"}}
+        """
         return await respond(lambda: sessions.state_page(request.session_id, request.cursor_id))
 
     @server.tool(structured_output=False)
     async def session_capabilities(request: SessionRequest) -> CallToolResult:
-        """Read the capabilities of an existing debugger session."""
+        """Read the capabilities of an existing debugger session.
+
+        Example: {"request":{"session_id":"0123456789abcdef"}}
+        """
         return await respond(lambda: sessions.session_capabilities(request.session_id))
 
     @server.tool(structured_output=False)
     async def session_terminate(request: SessionRequest) -> CallToolResult:
-        """Terminate an owned target, or detach an attached target."""
+        """Terminate an owned target, or detach an attached target.
+
+        Example: {"request":{"session_id":"0123456789abcdef"}}
+        """
         return await respond(lambda: sessions.session_terminate(request.session_id))
 
     return server
